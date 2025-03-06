@@ -38,6 +38,7 @@ export const ArticleParamsForm: React.FC<ArticleStateProps> = ({
 
 	const formReset = () => {
 		setFormState(defaultArticleState); // Функция для сброса состояния формы к значениям по умолчанию
+		setArticleState(defaultArticleState); // Применяем дефолтные стили сразу после сброса
 	};
 
 	const formSubmit = (event: FormEvent) => {
