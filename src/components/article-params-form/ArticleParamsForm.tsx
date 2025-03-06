@@ -32,9 +32,19 @@ export const ArticleParamsForm: React.FC<ArticleStateProps> = ({
 
 	const asideRef = useRef<HTMLElement>(null); // Ссылка на aside
 
-	const formChange = (formParameter: string) => (value: OptionType) => {
-		setFormState((prevState) => ({ ...prevState, [formParameter]: value })); // Используем prevState для избежания проблем с асинхронным обновлением состояния
-	};
+	interface FormValues {
+		fontFamilyOption: OptionType;
+		fontSizeOption: OptionType;
+		fontColor: OptionType;
+		backgroundColor: OptionType;
+		contentWidth: OptionType;
+	}
+
+	const formChange =
+		<K extends keyof FormValues>(formParameter: K) =>
+		(value: FormValues[K]) => {
+			setFormState((prevState) => ({ ...prevState, [formParameter]: value }));
+		};
 
 	const formReset = () => {
 		setFormState(defaultArticleState); // Функция для сброса состояния формы к значениям по умолчанию
@@ -46,25 +56,21 @@ export const ArticleParamsForm: React.FC<ArticleStateProps> = ({
 		setArticleState(formState); // Обновляем состояние статьи с использованием значений из формы
 	};
 
-	// Обработчик клика вне aside
+	const handleClickOutside = (event: MouseEvent) => {
+		if (asideRef.current && !asideRef.current.contains(event.target as Node)) {
+			setOpen(false); // Закрываем сайдбар
+		}
+	};
+
 	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				asideRef.current &&
-				!asideRef.current.contains(event.target as Node)
-			) {
-				setOpen(false); // Закрываем сайдбар
-			}
-		};
-
-		// Добавляем слушатель события при монтировании компонента
-		document.addEventListener('mousedown', handleClickOutside);
-
+		if (isOpen) {
+			document.addEventListener('mousedown', handleClickOutside);
+		}
 		// Удаляем слушатель события при размонтировании компонента
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, [asideRef]); // Зависимость от asideRef
+	}, [isOpen]);
 
 	return (
 		<>
@@ -73,9 +79,7 @@ export const ArticleParamsForm: React.FC<ArticleStateProps> = ({
 				className={clsx(styles.container, { [styles.container_open]: isOpen })}
 				ref={asideRef}>
 				<form className={styles.form} onSubmit={formSubmit}>
-					<Text size={31} weight={800} uppercase={true}>
-						Задайте параметры
-					</Text>
+					<h2 className={styles.formTitle}>Задайте параметры</h2>
 					<Select
 						selected={formState.fontFamilyOption}
 						options={fontFamilyOptions}
