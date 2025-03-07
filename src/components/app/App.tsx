@@ -1,5 +1,4 @@
 import React, { useState, CSSProperties } from 'react';
-
 import { Article } from '../article/Article';
 import { ArticleParamsForm } from '../article-params-form/ArticleParamsForm';
 import {

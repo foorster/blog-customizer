@@ -1,9 +1,6 @@
-import clsx from 'clsx';
 import React from 'react';
-
 import plane from 'src/images/plane.png';
 import { Text } from 'src/ui/text';
-
 import styles from './Article.module.scss';
 
 export const Article: React.FC = () => {
