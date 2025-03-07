@@ -3,7 +3,6 @@ import clsx from 'clsx';
 
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
-import { Text } from 'src/ui/text';
 import { Select } from 'src/ui/select';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
@@ -26,7 +25,7 @@ interface ArticleStateProps {
 export const ArticleParamsForm: React.FC<ArticleStateProps> = ({
 	setArticleState,
 }) => {
-	const [isOpen, setOpen] = useState(false); // Состояние, определяющее, открыт ли сайдбар с настройками
+	const [setIsOpen, setOpen] = useState(false); // Состояние, определяющее, открыт ли сайдбар с настройками
 	const [formState, setFormState] =
 		useState<ArticleStateType>(defaultArticleState); //Состояние формы, содержащее текущие значения параметров статьи
 
@@ -63,22 +62,30 @@ export const ArticleParamsForm: React.FC<ArticleStateProps> = ({
 	};
 
 	useEffect(() => {
-		if (isOpen) {
-			document.addEventListener('mousedown', handleClickOutside);
+		if (!setIsOpen) {
+			return;
 		}
-		// Удаляем слушатель события при размонтировании компонента
-		return () => {
-			document.removeEventListener('mousedown', handleClickOutside);
+		const handleMouseDown = (event: MouseEvent) => {
+			handleClickOutside(event);
 		};
-	}, [isOpen]);
+		document.addEventListener('mousedown', handleMouseDown);
+		return () => {
+			document.removeEventListener('mousedown', handleMouseDown);
+		};
+	}, [setIsOpen]);
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={() => setOpen((prev) => !prev)} />
+			<ArrowButton
+				isOpen={setIsOpen}
+				onClick={() => setOpen((prev) => !prev)}
+			/>
 			<aside
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}
+				className={clsx(styles.container, {
+					[styles.container_open]: setIsOpen,
+				})}
 				ref={asideRef}>
-				<form className={styles.form} onSubmit={formSubmit}>
+				<form className={styles.form} onSubmit={formSubmit} onReset={formReset}>
 					<h2 className={styles.formTitle}>Задайте параметры</h2>
 					<Select
 						selected={formState.fontFamilyOption}
@@ -113,12 +120,7 @@ export const ArticleParamsForm: React.FC<ArticleStateProps> = ({
 						onChange={formChange('contentWidth')}
 					/>
 					<div className={styles.bottomContainer}>
-						<Button
-							title='Сбросить'
-							htmlType='reset'
-							type='clear'
-							onClick={formReset}
-						/>
+						<Button title='Сбросить' htmlType='reset' type='clear' />
 						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>

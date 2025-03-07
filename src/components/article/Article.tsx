@@ -1,23 +1,13 @@
 import clsx from 'clsx';
+import React from 'react';
 
 import plane from 'src/images/plane.png';
 import { Text } from 'src/ui/text';
-import { ArticleStateType } from '../../constants/articleProps'; // Импортируем ArticleStateType
 import styles from './Article.module.scss';
-import React from 'react';
 
-interface ArticleProps {
-	articleState: ArticleStateType; // Определяем пропсу articleState
-}
-
-export const Article: React.FC<ArticleProps> = ({ articleState }) => {
-	// Принимаем пропсы
+export const Article: React.FC = () => {
 	return (
-		<article
-			className={clsx(styles.article)}
-			style={{ fontFamily: articleState.fontFamilyOption.value }}>
-			{' '}
-			{/* Используем значение из articleState */}
+		<article className={styles.article}>
 			<Text as='h1' size={45} weight={800} uppercase dynamicLite>
 				Портрет Западной Швейцарии
 			</Text>
