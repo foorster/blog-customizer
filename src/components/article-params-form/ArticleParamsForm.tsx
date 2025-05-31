@@ -1,15 +1,14 @@
 import { useState, FormEvent, useRef, useEffect } from 'react';
 import clsx from 'clsx';
-
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import { Select } from 'src/ui/select';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
+import { Text } from 'src/ui/text';
 import styles from './ArticleParamsForm.module.scss';
 import {
 	ArticleStateType,
-	OptionType,
 	backgroundColors,
 	contentWidthArr,
 	fontColors,
@@ -25,23 +24,17 @@ interface ArticleStateProps {
 export const ArticleParamsForm: React.FC<ArticleStateProps> = ({
 	setArticleState,
 }) => {
-	const [setIsOpen, setOpen] = useState(false); // Состояние, определяющее, открыт ли сайдбар с настройками
+	const [isOpen, setIsOpen] = useState(false); // Состояние, определяющее, открыт ли сайдбар с настройками
 	const [formState, setFormState] =
 		useState<ArticleStateType>(defaultArticleState); //Состояние формы, содержащее текущие значения параметров статьи
 
 	const asideRef = useRef<HTMLElement>(null); // Ссылка на aside
 
-	interface FormValues {
-		fontFamilyOption: OptionType;
-		fontSizeOption: OptionType;
-		fontColor: OptionType;
-		backgroundColor: OptionType;
-		contentWidth: OptionType;
-	}
+	const formTitle = 'Задайте параметры';
 
 	const formChange =
-		<K extends keyof FormValues>(formParameter: K) =>
-		(value: FormValues[K]) => {
+		<K extends keyof ArticleStateType>(formParameter: K) =>
+		(value: ArticleStateType[K]) => {
 			setFormState((prevState) => ({ ...prevState, [formParameter]: value }));
 		};
 
@@ -57,12 +50,12 @@ export const ArticleParamsForm: React.FC<ArticleStateProps> = ({
 
 	const handleClickOutside = (event: MouseEvent) => {
 		if (asideRef.current && !asideRef.current.contains(event.target as Node)) {
-			setOpen(false); // Закрываем сайдбар
+			setIsOpen(false); // Закрываем сайдбар
 		}
 	};
 
 	useEffect(() => {
-		if (!setIsOpen) {
+		if (!isOpen) {
 			return;
 		}
 		const handleMouseDown = (event: MouseEvent) => {
@@ -72,21 +65,20 @@ export const ArticleParamsForm: React.FC<ArticleStateProps> = ({
 		return () => {
 			document.removeEventListener('mousedown', handleMouseDown);
 		};
-	}, [setIsOpen]);
+	}, [isOpen]);
 
 	return (
 		<>
-			<ArrowButton
-				isOpen={setIsOpen}
-				onClick={() => setOpen((prev) => !prev)}
-			/>
+			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen((prev) => !prev)} />
 			<aside
 				className={clsx(styles.container, {
-					[styles.container_open]: setIsOpen,
+					[styles.container_open]: isOpen,
 				})}
 				ref={asideRef}>
 				<form className={styles.form} onSubmit={formSubmit} onReset={formReset}>
-					<h2 className={styles.formTitle}>Задайте параметры</h2>
+					<Text as='h2' size={31} weight={800} uppercase>
+						{formTitle}
+					</Text>
 					<Select
 						selected={formState.fontFamilyOption}
 						options={fontFamilyOptions}
